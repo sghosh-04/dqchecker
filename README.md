@@ -155,18 +155,6 @@ Useful URLs:
 - Health: `http://localhost:8080/actuator/health`
 - Info: `http://localhost:8080/actuator/info`
 
-## Configuration
-
-Environment overrides:
-
-```properties
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/dqchecker
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=postgres
-JWT_SECRET=mysecretkeymysecretkeymysecretkey1234567890
-JWT_EXPIRATION=86400000
-```
-
 ## API Summary
 
 Authentication:
