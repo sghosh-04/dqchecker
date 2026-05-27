@@ -18,7 +18,7 @@ export async function validateCsv(file: File, onProgress?: (progress: number) =>
 }
 
 export async function getReports() {
-  const { data } = await api.get<Report[]>("/reports");
+  const { data } = await api.get<Report[]>("/reports/all");
   return data;
 }
 

@@ -80,6 +80,8 @@ public class DataQualityController {
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
     }
 
+    @GetMapping("/reports/all")
+    @Operation(summary = "Get all validation reports with rule details")
     public List<ReportResponse> reports(Authentication authentication) {
         return reportService.getReports(authentication.getName(), isAdmin(authentication));
     }

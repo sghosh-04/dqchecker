@@ -37,6 +37,7 @@ public class AuthController {
     public LoginResponse login(
             @Valid @RequestBody LoginRequest request
     ) {
+        System.out.println("LOGIN HIT");
         return authService.login(request);
     }
 
