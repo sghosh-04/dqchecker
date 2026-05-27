@@ -1,158 +1,384 @@
-# dqchecker
+# Data Quality Validation Platform
 
-A Spring Boot REST API for data quality checking. Upload CSV files and validate them against configurable rules to identify data quality issues.
+Production-style Data Quality Validation Platform built using Spring Boot, PostgreSQL, JWT Authentication, and REST APIs.
+
+Upload datasets, run validation rules, store reports, and analyze results through APIs and dashboard integration.
+
+---
+
+## Features
+
+### Authentication & Authorization
+- User Registration
+- User Login
+- JWT Authentication
+- Role-Based Access (USER / ADMIN)
+- Protected APIs
+
+---
+
+### Data Quality Validation
+- CSV Upload
+- Null Validation
+- Range Validation
+- Duplicate Detection
+- Rule-based Validation Engine
+- Validation Reports
+
+---
+
+### Persistence
+- PostgreSQL Database
+- Upload History
+- Validation Report Storage
+- Validation Rule Storage
+
+---
+
+### API Features
+- REST APIs
+- Global Exception Handling
+- Swagger Documentation
+- Logging & Monitoring
+
+---
+
+### DevOps
+- Docker Support
+- Docker Compose
+- Environment Configuration
+
+---
 
 ## Tech Stack
 
+### Backend
 - Java 17
-- Spring Boot 4.0.6
-- Apache Commons CSV 1.10.0
-- Spring Security JWT
+- Spring Boot
+- Spring Security
 - Spring Data JPA
+- Hibernate
 - PostgreSQL
-- Springdoc OpenAPI
+- JWT
 - Maven
 
-## Prerequisites
+### Validation
+- Apache Commons CSV
 
-- Java 17+
-- Docker Desktop, optional
-- PostgreSQL, if not using Docker
-- Maven (or use the included `mvnw` wrapper)
+### Testing
+- JUnit 5
+- Mockito
 
-## Getting Started
+### Frontend (Optional)
+- React
+- Vite
+- TailwindCSS
 
-### Clone the repository
+---
 
-```bash
-git clone https://github.com/sghosh-04/dqchecker.git
-cd dqchecker
+# Architecture
+
+```text
+Client
+ ↓
+REST API
+ ↓
+JWT Security
+ ↓
+Service Layer
+ ↓
+Validation Engine
+ ↓
+PostgreSQL
+ ↓
+Reports + History
 ```
 
-### Run the application
+---
 
-```bash
-./mvnw spring-boot:run
-```
-
-On Windows:
-
-```bash
-mvnw.cmd spring-boot:run
-```
-
-The application starts on `http://localhost:8080` by default.
-
-Swagger UI is available at `http://localhost:8080/swagger-ui.html`.
-
-### Build a JAR
-
-```bash
-./mvnw clean package
-java -jar target/dqchecker-0.0.1-SNAPSHOT.jar
-```
-
-## Running Tests
-
-```bash
-./mvnw test
-```
-
-The Maven build runs JaCoCo and enforces 70%+ instruction coverage.
-
-## Docker Setup
-
-```bash
-docker compose up --build
-```
-
-This starts:
-
-- `app` on `http://localhost:8080`
-- `postgres` on `localhost:5432`
-
-## Configuration
-
-Runtime secrets are read from `application.properties` with environment variable overrides:
-
-```properties
-jwt.secret=${JWT_SECRET:mysecretkeymysecretkeymysecretkey1234567890}
-jwt.expiration=${JWT_EXPIRATION:86400000}
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/dqchecker}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:postgres}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:postgres}
-```
-
-## API Testing Examples
-
-Register:
-
-```bash
-curl -X POST http://localhost:8080/auth/register \
-  -H "Content-Type: application/json" \
-  -d "{\"username\":\"sayuri\",\"email\":\"sayuri@example.com\",\"password\":\"password123\",\"role\":\"USER\"}"
-```
-
-Login:
-
-```bash
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d "{\"email\":\"sayuri@example.com\",\"password\":\"password123\"}"
-```
-
-Validate CSV:
-
-```bash
-curl -X POST http://localhost:8080/validate \
-  -H "Authorization: Bearer <JWT_TOKEN>" \
-  -F "file=@customers.csv"
-```
-
-Reports:
-
-```bash
-curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:8080/reports
-curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:8080/reports/1
-```
-
-Admin users:
-
-```bash
-curl -H "Authorization: Bearer <ADMIN_JWT_TOKEN>" http://localhost:8080/admin/users
-```
-
-Import `dqchecker-postman-collection.json` into Postman for the same request set.
-
-## Project Structure
+# Project Structure
 
 ```text
 dqchecker
+│
+├── controller/
+├── service/
+├── repository/
+├── entity/
+├── dto/
+├── config/
+├── security/
+├── exception/
+├── engine/
+├── rules/
+├── util/
+├── model/
+│
 ├── Dockerfile
 ├── docker-compose.yml
-├── dqchecker-postman-collection.json
 ├── pom.xml
-└── src
-    ├── main
-    │   ├── java/com/sayuri/dqchecker
-    │   │   ├── config
-    │   │   ├── controller
-    │   │   ├── dto
-    │   │   ├── engine
-    │   │   ├── entity
-    │   │   ├── exception
-    │   │   ├── model
-    │   │   ├── repository
-    │   │   ├── rules
-    │   │   ├── security
-    │   │   ├── service
-    │   │   └── util
-    │   └── resources/application.properties
-    └── test
-        ├── java/com/sayuri/dqchecker
-        │   ├── controller
-        │   ├── exception
-        │   ├── security
-        │   └── service
-        └── resources/application.properties
+└── README.md
 ```
+
+---
+
+# Database Schema
+
+## users
+
+| Column |
+|--------|
+| id |
+| username |
+| email |
+| password |
+| role |
+
+---
+
+## uploaded_files
+
+| Column |
+|--------|
+| id |
+| file_name |
+| uploaded_at |
+| user_id |
+
+---
+
+## validation_reports
+
+| Column |
+|--------|
+| id |
+| status |
+| created_at |
+| uploaded_file_id |
+
+---
+
+## validation_rules
+
+| Column |
+|--------|
+| id |
+| rule_name |
+| passed |
+| report_id |
+
+---
+
+# API Documentation
+
+## Auth
+
+### Register
+
+```http
+POST /auth/register
+```
+
+Request:
+
+```json
+{
+  "username":"sayuri",
+  "email":"sayuri@test.com",
+  "password":"abc123"
+}
+```
+
+Response:
+
+```json
+{
+  "message":"User registered successfully"
+}
+```
+
+---
+
+### Login
+
+```http
+POST /auth/login
+```
+
+Request:
+
+```json
+{
+  "email":"sayuri@test.com",
+  "password":"abc123"
+}
+```
+
+Response:
+
+```json
+{
+  "token":"jwt_token_here"
+}
+```
+
+---
+
+## Validation
+
+### Upload + Validate
+
+```http
+POST /validate
+```
+
+Body:
+
+multipart/form-data
+
+```text
+file → dataset.csv
+```
+
+---
+
+### Reports
+
+```http
+GET /reports
+```
+
+```http
+GET /reports/{id}
+```
+
+---
+
+# Setup
+
+## Clone
+
+```bash
+git clone <repo-url>
+cd dqchecker
+```
+
+---
+
+## Configure Database
+
+Create database:
+
+```sql
+CREATE DATABASE dqchecker;
+```
+
+Update:
+
+```text
+src/main/resources/application.properties
+```
+
+Example:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/dqchecker
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+```
+
+---
+
+## Run Backend
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+Server:
+
+```text
+http://localhost:8080
+```
+
+---
+
+## Swagger
+
+Open:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+---
+
+## Docker
+
+Build:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+# Testing
+
+Run:
+
+```bash
+mvn test
+```
+
+Coverage target:
+
+```text
+70%+
+```
+
+---
+
+# Sample Validation Rules
+
+Implemented:
+
+- NullCheckRule
+- RangeRule
+- DuplicateRule
+
+Future:
+
+- RegexRule
+- DataTypeRule
+- ReferentialIntegrityRule
+- StatisticalAnomalyRule
+
+---
+
+# Future Improvements
+
+- Async Validation
+- Email Export
+- Redis Cache
+- CI/CD
+- Cloud Deployment
+- Multi-tenant Support
+- Analytics Dashboard
+
+---
+
+# Author
+
+Sayuri Ghosh
+
+Built as a production-style backend system to demonstrate:
+
+- OOP
+- REST API Design
+- Security
+- Database Design
+- System Architecture
+- Validation Engines
+- Backend Engineering
