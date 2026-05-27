@@ -1,5 +1,6 @@
 package com.sayuri.dqchecker.util;
 
+import com.sayuri.dqchecker.exception.InvalidFileException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -31,7 +32,7 @@ public class DataLoader {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new InvalidFileException("Unable to parse CSV file", e);
         }
 
         return data;

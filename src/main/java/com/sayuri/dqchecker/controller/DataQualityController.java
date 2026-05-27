@@ -1,45 +1,68 @@
 package com.sayuri.dqchecker.controller;
 
-import com.sayuri.dqchecker.engine.DataQualityEngine;
+import com.sayuri.dqchecker.dto.ReportResponse;
+import com.sayuri.dqchecker.dto.ValidationResponse;
+import com.sayuri.dqchecker.exception.InvalidFileException;
 import com.sayuri.dqchecker.model.QualityReport;
-import com.sayuri.dqchecker.rules.*;
-import com.sayuri.dqchecker.util.DataLoader;
-
+import com.sayuri.dqchecker.service.FileStorageService;
+import com.sayuri.dqchecker.service.ReportService;
+import com.sayuri.dqchecker.service.ValidationService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
 public class DataQualityController {
 
     private List<Map<String, String>> data;
 
-    @PostMapping("/upload")
+    private final ValidationService validationService;
+    private final ReportService reportService;
+    private final FileStorageService fileStorageService;
+
+    public DataQualityController(ValidationService validationService, ReportService reportService,
+                                 FileStorageService fileStorageService) {
+        this.validationService = validationService;
+        this.reportService = reportService;
+        this.fileStorageService = fileStorageService;
+    }
+
+    @PostMapping("/api/upload")
     public String upload(@RequestParam("file") MultipartFile file) {
-        try {
-            InputStream inputStream = file.getInputStream();
-            data = DataLoader.loadCSV(inputStream);
-            return "File uploaded successfully!";
-        } catch (Exception e) {
-            return "Error uploading file";
+        data = fileStorageService.parseCsv(file);
+        return "File uploaded successfully!";
+    }
+
+    @PostMapping("/api/validate")
+    public QualityReport validate() {
+        if (data == null) {
+            throw new InvalidFileException("Upload a CSV file before validating");
         }
+        return validationService.validateRows(data);
     }
 
     @PostMapping("/validate")
-    public QualityReport validate() {
+    public ValidationResponse validateFile(@RequestParam("file") MultipartFile file, Authentication authentication) {
+        return validationService.validate(file, authentication.getName());
+    }
 
-        List<Rule> rules = List.of(
-                new NullCheckRule("name"),
-                new RangeRule("age", 0, 100),
-                new DuplicateRule("email")
-        );
+    @GetMapping("/reports")
+    public List<ReportResponse> reports(Authentication authentication) {
+        return reportService.getReports(authentication.getName(), isAdmin(authentication));
+    }
 
-        DataQualityEngine engine = new DataQualityEngine(rules);
+    @GetMapping("/reports/{id}")
+    public ReportResponse report(@PathVariable Long id, Authentication authentication) {
+        return reportService.getReport(id, authentication.getName(), isAdmin(authentication));
+    }
 
-        return engine.run(data);
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch("ROLE_ADMIN"::equals);
     }
 }
