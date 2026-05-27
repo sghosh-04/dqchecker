@@ -45,6 +45,9 @@ public class ValidationReport {
     @OneToMany(mappedBy = "validationReport", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ValidationRule> rules = new ArrayList<>();
 
+    @OneToMany(mappedBy = "validationReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ValidationResult> results = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -87,5 +90,9 @@ public class ValidationReport {
 
     public List<ValidationRule> getRules() {
         return rules;
+    }
+
+    public List<ValidationResult> getResults() {
+        return results;
     }
 }

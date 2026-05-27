@@ -2,7 +2,8 @@ package com.sayuri.dqchecker.service;
 
 import com.sayuri.dqchecker.entity.UploadedFile;
 import com.sayuri.dqchecker.entity.User;
-import com.sayuri.dqchecker.exception.InvalidFileException;
+import com.sayuri.dqchecker.exception.FileStorageException;
+import com.sayuri.dqchecker.exception.InvalidCsvException;
 import com.sayuri.dqchecker.repository.UploadedFileRepository;
 import com.sayuri.dqchecker.repository.UserRepository;
 import com.sayuri.dqchecker.util.DataLoader;
@@ -31,7 +32,7 @@ public class FileStorageService {
     public UploadedFile saveMetadata(MultipartFile file, String userEmail) {
         validateCsv(file);
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new InvalidFileException("Authenticated user was not found"));
+                .orElseThrow(() -> new InvalidCsvException("Authenticated user was not found"));
 
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setOriginalFilename(file.getOriginalFilename() == null ? "upload.csv" : file.getOriginalFilename());
@@ -49,17 +50,17 @@ public class FileStorageService {
         try {
             return DataLoader.loadCSV(file.getInputStream());
         } catch (IOException ex) {
-            throw new InvalidFileException("Unable to read uploaded file", ex);
+            throw new FileStorageException("Unable to read uploaded file", ex);
         }
     }
 
     private void validateCsv(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new InvalidFileException("CSV file is required");
+            throw new InvalidCsvException("CSV file is required");
         }
         String filename = file.getOriginalFilename();
         if (filename != null && !filename.toLowerCase().endsWith(".csv")) {
-            throw new InvalidFileException("Only CSV files are supported");
+            throw new InvalidCsvException("Only CSV files are supported");
         }
     }
 }

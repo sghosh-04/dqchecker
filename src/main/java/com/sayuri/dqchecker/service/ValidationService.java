@@ -4,6 +4,7 @@ import com.sayuri.dqchecker.dto.ValidationResponse;
 import com.sayuri.dqchecker.engine.DataQualityEngine;
 import com.sayuri.dqchecker.entity.UploadedFile;
 import com.sayuri.dqchecker.entity.ValidationReport;
+import com.sayuri.dqchecker.entity.ValidationResult;
 import com.sayuri.dqchecker.entity.ValidationRule;
 import com.sayuri.dqchecker.model.QualityReport;
 import com.sayuri.dqchecker.model.RuleResult;
@@ -78,6 +79,14 @@ public class ValidationService {
             validationRule.setErrorMessages(result.getErrorMessages());
             validationRule.setValidationReport(validationReport);
             validationReport.getRules().add(validationRule);
+
+            ValidationResult validationResult = new ValidationResult();
+            validationResult.setRuleName(result.getRuleName());
+            validationResult.setPassed(result.isPassed());
+            validationResult.setErrorCount(result.getErrorCount());
+            validationResult.setErrorMessages(result.getErrorMessages());
+            validationResult.setValidationReport(validationReport);
+            validationReport.getResults().add(validationResult);
         }
 
         return validationReportRepository.save(validationReport);

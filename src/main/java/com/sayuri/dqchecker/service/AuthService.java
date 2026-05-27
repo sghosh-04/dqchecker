@@ -2,6 +2,7 @@ package com.sayuri.dqchecker.service;
 
 import com.sayuri.dqchecker.dto.RegisterRequest;
 import com.sayuri.dqchecker.dto.RegisterResponse;
+import com.sayuri.dqchecker.dto.ProfileResponse;
 import com.sayuri.dqchecker.entity.Role;
 import com.sayuri.dqchecker.entity.User;
 import com.sayuri.dqchecker.exception.UnauthorizedException;
@@ -64,6 +65,16 @@ public class AuthService {
         log.info("User logged in with email {}", user.getEmail());
 
         return new LoginResponse("Login successful", token);
+    }
+
+    public ProfileResponse profile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("Authenticated user was not found"));
+        return new ProfileResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole());
     }
 
     private Role resolveRole(String role) {

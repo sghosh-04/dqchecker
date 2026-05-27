@@ -2,6 +2,7 @@ package com.sayuri.dqchecker.service;
 
 import com.sayuri.dqchecker.dto.LoginRequest;
 import com.sayuri.dqchecker.dto.LoginResponse;
+import com.sayuri.dqchecker.dto.ProfileResponse;
 import com.sayuri.dqchecker.dto.RegisterRequest;
 import com.sayuri.dqchecker.entity.Role;
 import com.sayuri.dqchecker.entity.User;
@@ -75,6 +76,17 @@ class AuthServiceTest {
         when(passwordEncoder.matches("password123", "encoded")).thenReturn(false);
 
         assertThrows(UnauthorizedException.class, () -> authService.login(loginRequest()));
+    }
+
+    @Test
+    void profileReturnsAuthenticatedUser() {
+        when(userRepository.findByEmail("sayuri@example.com")).thenReturn(Optional.of(user()));
+
+        ProfileResponse response = authService.profile("sayuri@example.com");
+
+        assertEquals("sayuri", response.getUsername());
+        assertEquals("sayuri@example.com", response.getEmail());
+        assertEquals(Role.USER, response.getRole());
     }
 
     private RegisterRequest registerRequest(String role) {

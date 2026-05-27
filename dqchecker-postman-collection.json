@@ -19,77 +19,157 @@
   ],
   "item": [
     {
-      "name": "Register",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/auth/register",
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"sayuri\",\n  \"email\": \"sayuri@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
-        }
-      }
-    },
-    {
-      "name": "Login",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{baseUrl}}/auth/login",
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"email\": \"sayuri@example.com\",\n  \"password\": \"password123\"\n}"
-        }
-      }
-    },
-    {
-      "name": "Validate CSV",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token}}"
-          }
-        ],
-        "url": "{{baseUrl}}/validate",
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "file",
-              "type": "file",
-              "src": []
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"sayuri\",\n  \"email\": \"sayuri@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
             }
-          ]
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sayuri@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/profile"
+          }
         }
-      }
+      ]
+    },
+    {
+      "name": "Validation",
+      "item": [
+        {
+          "name": "Validate CSV",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/validate",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Validation Report By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/validate/{{reportId}}"
+          }
+        }
+      ]
     },
     {
       "name": "Reports",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token}}"
+      "item": [
+        {
+          "name": "Report History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reports?page=0&size=10"
           }
-        ],
-        "url": "{{baseUrl}}/reports"
-      }
+        },
+        {
+          "name": "Filtered Failures",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reports?page=0&size=10&passed=false&filename=customers"
+          }
+        },
+        {
+          "name": "Report By Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}"
+          }
+        },
+        {
+          "name": "Delete Report",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}"
+          }
+        }
+      ]
     },
     {
-      "name": "Report By Id",
+      "name": "Dashboard",
       "request": {
         "method": "GET",
         "header": [
@@ -98,7 +178,7 @@
             "value": "Bearer {{token}}"
           }
         ],
-        "url": "{{baseUrl}}/reports/{{reportId}}"
+        "url": "{{baseUrl}}/dashboard"
       }
     },
     {
@@ -112,6 +192,20 @@
           }
         ],
         "url": "{{baseUrl}}/admin/users"
+      }
+    },
+    {
+      "name": "Actuator Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/actuator/health"
+      }
+    },
+    {
+      "name": "Actuator Info",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/actuator/info"
       }
     }
   ]

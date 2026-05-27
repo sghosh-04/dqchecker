@@ -1,6 +1,7 @@
 package com.sayuri.dqchecker.service;
 
 import com.sayuri.dqchecker.dto.ReportResponse;
+import com.sayuri.dqchecker.dto.ReportSummary;
 import com.sayuri.dqchecker.entity.Role;
 import com.sayuri.dqchecker.entity.UploadedFile;
 import com.sayuri.dqchecker.entity.User;
@@ -13,13 +14,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -56,6 +62,30 @@ class ReportServiceTest {
 
         assertThrows(ResourceNotFoundException.class,
                 () -> reportService.getReport(10L, "sayuri@example.com", false));
+    }
+
+    @Test
+    void getReportHistoryReturnsPagedSummaries() {
+        ValidationReport report = sampleReport("sayuri@example.com");
+        PageRequest pageable = PageRequest.of(0, 10);
+        when(validationReportRepository.searchReports("sayuri@example.com", false, false, "customers", pageable))
+                .thenReturn(new PageImpl<>(List.of(report), pageable, 1));
+
+        Page<ReportSummary> page = reportService.getReportHistory(
+                "sayuri@example.com", false, false, " customers ", pageable);
+
+        assertEquals(1, page.getTotalElements());
+        assertEquals("customers.csv", page.getContent().get(0).getFilename());
+    }
+
+    @Test
+    void deleteReportDeletesOwnedReport() {
+        ValidationReport report = sampleReport("sayuri@example.com");
+        when(validationReportRepository.findWithRulesById(10L)).thenReturn(Optional.of(report));
+
+        reportService.deleteReport(10L, "sayuri@example.com", false);
+
+        verify(validationReportRepository).delete(report);
     }
 
     private ValidationReport sampleReport(String ownerEmail) {
