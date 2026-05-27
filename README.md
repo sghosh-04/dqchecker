@@ -322,7 +322,7 @@ Request:
 {
   "username":"sayuri",
   "email":"sayuri@test.com",
-  "password":"abc123"
+  "password":"abc12345"
 }
 ```
 
