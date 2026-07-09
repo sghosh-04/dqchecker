@@ -1,6 +1,7 @@
 package com.sayuri.dqchecker.controller;
 
 import com.sayuri.dqchecker.dto.ReportResponse;
+import com.sayuri.dqchecker.dto.RuleConfigRequest;
 import com.sayuri.dqchecker.dto.ValidationResponse;
 import com.sayuri.dqchecker.exception.InvalidFileException;
 import com.sayuri.dqchecker.model.QualityReport;
@@ -33,10 +34,11 @@ class DataQualityControllerTest {
     void rootValidateDelegatesToValidationService() {
         MockMultipartFile file = new MockMultipartFile("file", "customers.csv", "text/csv", "a,b\n1,2".getBytes());
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("sayuri@example.com", null);
-        when(validationService.validate(file, "sayuri@example.com"))
+        List<RuleConfigRequest> rules = java.util.Collections.emptyList();
+        when(validationService.validate(file, rules, "sayuri@example.com"))
                 .thenReturn(new ValidationResponse(10L, true, 3, 0));
 
-        assertEquals(10L, controller.validateFile(file, authentication).getReportId());
+        assertEquals(10L, controller.validateFile(file, rules, authentication).getReportId());
     }
 
     @Test
@@ -45,7 +47,7 @@ class DataQualityControllerTest {
         List<Map<String, String>> rows = List.of(Map.of("name", "Ana", "age", "20", "email", "a@example.com"));
         QualityReport report = new QualityReport(List.of(new RuleResult("ok", true, 0, List.of())));
 
-        when(fileStorageService.parseCsv(file)).thenReturn(rows);
+        when(fileStorageService.parseFile(file)).thenReturn(rows);
         when(validationService.validateRows(rows)).thenReturn(report);
 
         assertEquals("File uploaded successfully!", controller.upload(file));

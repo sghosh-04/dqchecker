@@ -1,9 +1,26 @@
 import { api } from "./api";
 import type { AdminUser, Report, ValidationResponse } from "@/types/report";
 
-export async function validateCsv(file: File, onProgress?: (progress: number) => void) {
+export interface RuleConfig {
+  type: string;
+  columnName: string;
+  min: number | null;
+  max: number | null;
+}
+
+export async function parseHeaders(file: File) {
   const formData = new FormData();
   formData.append("file", file);
+  const { data } = await api.post<string[]>("/api/parse-headers", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+  return data;
+}
+
+export async function validateCsv(file: File, rules: RuleConfig[], onProgress?: (progress: number) => void) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("rules", new Blob([JSON.stringify(rules)], { type: "application/json" }));
 
   const { data } = await api.post<ValidationResponse>("/validate", formData, {
     headers: { "Content-Type": "multipart/form-data" },

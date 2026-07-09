@@ -24,10 +24,6 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(InvalidCsvException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidCsv(InvalidCsvException ex) {
-        return error(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
 
     @ExceptionHandler({UnauthorizedException.class, BadCredentialsException.class})
     public ResponseEntity<Map<String, Object>> handleUnauthorized(RuntimeException ex) {

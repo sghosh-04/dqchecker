@@ -3,6 +3,7 @@ package com.sayuri.dqchecker.controller;
 import com.sayuri.dqchecker.dto.ReportResponse;
 import com.sayuri.dqchecker.dto.ReportSummary;
 import com.sayuri.dqchecker.dto.ValidationResponse;
+import com.sayuri.dqchecker.dto.RuleConfigRequest;
 import com.sayuri.dqchecker.exception.InvalidFileException;
 import com.sayuri.dqchecker.model.QualityReport;
 import com.sayuri.dqchecker.service.FileStorageService;
@@ -38,9 +39,9 @@ public class DataQualityController {
     }
 
     @PostMapping("/api/upload")
-    @Operation(summary = "Upload a CSV for legacy in-memory validation")
+    @Operation(summary = "Upload a CSV or Excel file for legacy in-memory validation")
     public String upload(@RequestParam("file") MultipartFile file) {
-        data = fileStorageService.parseCsv(file);
+        data = fileStorageService.parseFile(file);
         return "File uploaded successfully!";
     }
 
@@ -48,15 +49,24 @@ public class DataQualityController {
     @Operation(summary = "Run legacy in-memory validation")
     public QualityReport validate() {
         if (data == null) {
-            throw new InvalidFileException("Upload a CSV file before validating");
+            throw new InvalidFileException("Upload a CSV or Excel file before validating");
         }
         return validationService.validateRows(data);
     }
 
-    @PostMapping("/validate")
-    @Operation(summary = "Upload, validate, persist, and return a report id")
-    public ValidationResponse validateFile(@RequestParam("file") MultipartFile file, Authentication authentication) {
-        return validationService.validate(file, authentication.getName());
+    @PostMapping(value = "/api/parse-headers", consumes = "multipart/form-data")
+    @Operation(summary = "Parse and return headers of CSV or Excel file")
+    public List<String> parseHeaders(@RequestParam("file") MultipartFile file) {
+        return fileStorageService.parseHeaders(file);
+    }
+
+    @PostMapping(value = "/validate", consumes = "multipart/form-data")
+    @Operation(summary = "Upload, validate with custom rules, persist, and return a report id")
+    public ValidationResponse validateFile(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("rules") List<RuleConfigRequest> rules,
+            Authentication authentication) {
+        return validationService.validate(file, rules, authentication.getName());
     }
 
     @GetMapping("/validate/{id}")

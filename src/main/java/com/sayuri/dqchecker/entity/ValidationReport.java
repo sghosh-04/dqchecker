@@ -14,8 +14,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "validation_reports")
@@ -43,10 +43,10 @@ public class ValidationReport {
     private UploadedFile uploadedFile;
 
     @OneToMany(mappedBy = "validationReport", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ValidationRule> rules = new ArrayList<>();
+    private Set<ValidationRule> rules = new HashSet<>();
 
     @OneToMany(mappedBy = "validationReport", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ValidationResult> results = new ArrayList<>();
+    private Set<ValidationResult> results = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -88,11 +88,11 @@ public class ValidationReport {
         this.uploadedFile = uploadedFile;
     }
 
-    public List<ValidationRule> getRules() {
+    public Set<ValidationRule> getRules() {
         return rules;
     }
 
-    public List<ValidationResult> getResults() {
+    public Set<ValidationResult> getResults() {
         return results;
     }
 }

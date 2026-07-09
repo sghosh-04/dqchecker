@@ -34,28 +34,53 @@ export function Login() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>Access your validation dashboard.</CardDescription>
+    <Card className="w-full max-w-md border border-neutral-200 dark:border-neutral-800 shadow-sm rounded-2xl">
+      <CardHeader className="space-y-1.5 pb-6">
+        <div className="flex justify-center mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#10a37f] text-white font-bold text-base shadow-sm">
+            DQ
+          </div>
+        </div>
+        <CardTitle className="text-xl font-bold text-center">Welcome back</CardTitle>
+        <CardDescription className="text-center text-xs text-muted-foreground">
+          Enter your credentials to access your quality checks.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email address</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="name@example.com" 
+              value={email} 
+              onChange={(event) => setEmail(event.target.value)} 
+              required 
+              className="h-10 rounded-lg"
+            />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password">Password</Label>
+            </div>
+            <Input 
+              id="password" 
+              type="password" 
+              placeholder="••••••••" 
+              value={password} 
+              onChange={(event) => setPassword(event.target.value)} 
+              required 
+              className="h-10 rounded-lg"
+            />
           </div>
-          <Button className="w-full" disabled={loading}>
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            Login
+          <Button className="w-full h-10 bg-[#10a37f] hover:bg-[#10a37f]/90 text-white font-semibold rounded-lg text-sm mt-2 transition-all" disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin shrink-0" /> : null}
+            Sign In
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          No account? <Link className="font-medium text-primary" to="/register">Create one</Link>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          New to the platform? <Link className="font-semibold text-[#10a37f] hover:underline" to="/register">Create an account</Link>
         </p>
       </CardContent>
     </Card>
